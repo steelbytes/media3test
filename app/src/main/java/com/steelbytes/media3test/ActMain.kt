@@ -4,19 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableString
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.media3.common.Effect
 import androidx.media3.common.MediaItem
-import androidx.media3.effect.OverlayEffect
-import androidx.media3.effect.TextOverlay
-import androidx.media3.effect.TextureOverlay
+import androidx.media3.effect.Crop
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.google.common.collect.ImmutableList
 import com.steelbytes.media3test.databinding.ActmainBinding
 
 @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
@@ -27,6 +23,7 @@ class ActMain : AppCompatActivity(), View.OnClickListener {
     private var player: ExoPlayer? = null
     private var playerView: PlayerView? = null
     private var uri:Uri? = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-avc-baseline-480.mp4")
+    private var effects: ArrayList<Effect>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,22 +32,25 @@ class ActMain : AppCompatActivity(), View.OnClickListener {
         binding.load.setOnClickListener(this)
     }
 
-    override fun onClick(v: View?) {
-        if (v == null)
-            return
-        when (v.id) {
-            R.id.load -> doLoad()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-        doStart()
+        start()
     }
 
     override fun onPause() {
-        doStop()
+        //player?.pause() // normal style (and annoyingly will then auto play during onResume)
+        playerDestroy() // shows bug
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        playerViewDestroy()
+        super.onDestroy()
+    }
+
+    override fun onClick(v: View?) {
+        if (v != null && v.id == R.id.load)
+            doLoad()
     }
 
     private fun doLoad() {
@@ -62,58 +62,69 @@ class ActMain : AppCompatActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            1 -> {
-                if (resultCode == RESULT_OK) {
-                    data?.data?.let { f ->
-                        contentResolver.takePersistableUriPermission(f, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        doStop()
-                        uri = f
-                        doStart()
-                    }
-                }
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            data?.data?.let { f ->
+                playerDestroy() // so we can change effects
+                uri = f
+                start()
             }
         }
     }
 
-    private fun doStart() {
-        if (uri == null)
-            return
-        var player = player
-        if (player != null) return
-
-        player = ExoPlayer.Builder(this).build()
-        this.player = player
-        player.playWhenReady = false
-        player.repeatMode = ExoPlayer.REPEAT_MODE_OFF
-
-        val playerView = PlayerView(this)
-        this.playerView = playerView
-        binding.frame.addView(playerView, 0)
-        (playerView.layoutParams as FrameLayout.LayoutParams).let { lp ->
-            lp.width = ConstraintLayout.LayoutParams.MATCH_PARENT
-            lp.height = ConstraintLayout.LayoutParams.MATCH_PARENT
+    private fun start() {
+       var playerView = this.playerView
+        if (playerView == null) {
+            playerView = PlayerView(this)
+            this.playerView = playerView
+            binding.frame.addView(playerView, 0)
+            (playerView.layoutParams as FrameLayout.LayoutParams).let { lp ->
+                lp.width = ConstraintLayout.LayoutParams.MATCH_PARENT
+                lp.height = ConstraintLayout.LayoutParams.MATCH_PARENT
+            }
         }
+
+        var player = this.player
+        if (player == null) {
+            player = ExoPlayer.Builder(this).build()
+            this.player = player
+            player.playWhenReady = false
+            player.repeatMode = ExoPlayer.REPEAT_MODE_OFF
+        }
+
         playerView.player = player
 
-        val effects = ArrayList<Effect>()
-        effects.add(OverlayEffect(ImmutableList.Builder<TextureOverlay>().add(TextOverlay.createStaticTextOverlay(SpannableString("test"))).build()))
-        player.setVideoEffects(effects)
-        val mediaItem = MediaItem.Builder().setUri(uri).build()
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.play()
+        val uri = this.uri
+        if (uri != null) {
+            player.setVideoEffects(listOf<Effect>(
+                // any effects shows the bug
+                Crop(-0.9f, 0.9f, -0.9f, 0.9f),
+                //OverlayEffect(ImmutableList.Builder<TextureOverlay>().add(TextOverlay.createStaticTextOverlay(SpannableString(uri.lastPathSegment))).build())
+            ))
+            player.setMediaItem(MediaItem.Builder().setUri(uri).build())
+            player.prepare()
+            //player.play() // normal style. bug happens regardless
+        }
     }
 
-    private fun doStop() {
-        val player = player ?: return
-        val playerView = this.playerView ?: return
-        player.stop()
-        player.release()
-        playerView.player = null
-        binding.frame.removeView(playerView)
-        this.player = null
-        this.playerView = null
+    private fun playerDestroy() {
+        val player = this.player
+        if (player != null) {
+            player.stop()
+            playerView?.player = null
+            player.release() // this triggers the bug when called on the second player that we destroy
+            this.player = null
+            effects = null
+        }
+    }
+
+    private fun playerViewDestroy() {
+        playerDestroy()
+        val playerView = this.playerView
+        if (playerView != null) {
+            playerView.player = null
+            binding.frame.removeView(playerView)
+            this.playerView = null
+        }
     }
 
 }
