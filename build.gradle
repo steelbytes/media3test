@@ -1,0 +1,22 @@
+buildscript {
+    ext.kotlinVer = "1.9.20"
+    ext.kotlinPluginVer = "1.9.20"
+    ext.kotlinVerx = "1.7.3"
+    ext.kspVer = "1.9.20-1.0.14"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.6.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinPluginVer"
+        classpath "com.google.devtools.ksp:symbol-processing-gradle-plugin:$kspVer"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
