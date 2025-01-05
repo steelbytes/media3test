@@ -34,12 +34,14 @@ class ActMain : AppCompatActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+        playerView?.onResume()
         start()
     }
 
     override fun onPause() {
         //player?.pause() // normal style (and annoyingly will then auto play during onResume)
         playerDestroy() // shows bug
+        playerView?.onPause()
         super.onPause()
     }
 
