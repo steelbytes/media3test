@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Media3Test" parent="Theme.MaterialComponents.DayNight" />
+    <style name="MyAppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 </resources>

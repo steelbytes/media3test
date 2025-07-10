@@ -14,6 +14,7 @@ import androidx.media3.effect.Crop
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.steelbytes.media3test.databinding.ActmainBinding
+import androidx.core.net.toUri
 
 @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 @SuppressLint("UnsafeOptInUsageError")
@@ -22,13 +23,15 @@ class ActMain : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActmainBinding
     private var player: ExoPlayer? = null
     private var playerView: PlayerView? = null
-    private var uri:Uri? = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-avc-baseline-480.mp4")
+    private var uri:Uri? = "https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-avc-baseline-480.mp4".toUri()
     private var effects: ArrayList<Effect>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement, /* force */ false)
         super.onCreate(savedInstanceState)
         binding = ActmainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         binding.load.setOnClickListener(this)
     }
 

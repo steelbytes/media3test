@@ -3,21 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-
+    android:orientation="vertical">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:layout_width="match_parent"
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:title="@string/app_name"
+        android:layout_height="wrap_content"/>
     <Button
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
         android:id="@+id/load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="load"
         tools:ignore="HardcodedText" />
-
     <FrameLayout
         android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="0px"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
         android:layout_weight="1" />
-
 </LinearLayout>

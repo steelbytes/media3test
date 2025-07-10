@@ -1,14 +1,21 @@
 buildscript {
-    ext.kotlinVer = "1.9.20"
-    ext.kotlinPluginVer = "1.9.20"
-    ext.kotlinVerx = "1.7.3"
-    ext.kspVer = "1.9.20-1.0.14"
+    ext.minVer = 21
+    ext.sdkVer = 35
+    ext.buildToolsVer = "36.0.0"
+    ext.kotlinVer = "2.1.20"
+    ext.kotlinPluginVer = "2.1.20"
+    ext.kotlinVerx = "1.10.2"
+    ext.kspVer = "2.1.20-1.0.31"
+    ext.compileOptions_compatibility = JavaVersion.VERSION_21
+    ext.kotlinOptions_jvmTarget = "21"
+    ext.kotlin_jvmToolchain = 21
+    ext.kotlinOptions_compilerArgs = ["-Xno-call-assertions", "-Xno-param-assertions", "-Xno-receiver-assertions"]
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.6.1'
+        classpath 'com.android.tools.build:gradle:8.11.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinPluginVer"
         classpath "com.google.devtools.ksp:symbol-processing-gradle-plugin:$kspVer"
     }
