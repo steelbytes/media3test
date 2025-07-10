@@ -12,17 +12,9 @@
     <Button
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
-        android:id="@+id/bug1"
+        android:id="@+id/load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ExoPlayer.release + effects -> mem leak"
-        tools:ignore="HardcodedText" />
-    <Button
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:id="@+id/bug2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Transformer -> variable fame rate"
+        android:text="load"
         tools:ignore="HardcodedText" />
 </LinearLayout>
